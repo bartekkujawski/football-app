@@ -1,3 +1,5 @@
+import { localApiCall } from './localApi';
+
 const API_BASE = import.meta.env.VITE_API_URL;
 
 export const useApi = () => {
@@ -13,6 +15,8 @@ export const useApi = () => {
         };
 
         try {
+            if (!API_BASE) return await localApiCall<R, P>(url, method, payload);
+
             const response = await fetch(`${API_BASE}${url}`, fetchCfg);
 
             if (response.ok) {
