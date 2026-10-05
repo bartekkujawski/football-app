@@ -2,6 +2,8 @@
 
 A football team management application for managing teams, players, games, and statistics. Built with React, TypeScript, and Vite.
 
+**Live demo:** https://bartekkujawski.github.io/football-app/
+
 ## 🚀 Features
 
 ### 1. **Players**
@@ -40,7 +42,8 @@ A football team management application for managing teams, players, games, and s
 -   **Vite** - build tool
 -   **TanStack Query (React Query)** - data management and caching
 -   **Styled Components** - component styling
--   **JSON Server** - mock API backend
+-   **JSON Server** - mock API backend (local development)
+-   **localStorage** - built-in data storage for the deployed version
 -   **ESLint** - code linting
 
 ## 📐 Project Requirements
@@ -61,7 +64,7 @@ This project was built with the following requirements and constraints:
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/bartekkujawski/football-app.git
 cd football-app
 ```
 
@@ -108,7 +111,8 @@ football-app/
 │   │   └── Header.tsx       # Application header
 │   ├── hooks/               # Custom hooks
 │   │   ├── useMenu.ts       # Navigation hook
-│   │   └── useApi.ts        # API communication hook
+│   │   ├── useApi.ts        # API communication hook
+│   │   └── localApi.ts      # localStorage API (used when VITE_API_URL is empty)
 │   ├── quieries/            # React Query hooks
 │   │   ├── useGetInfoQuery.ts
 │   │   ├── useCreateQuery.ts
@@ -116,8 +120,13 @@ football-app/
 │   │   └── useDeleteQuery.ts
 │   ├── types/               # TypeScript type definitions
 │   ├── helpers/             # Styled components and utility functions
-│   ├── db.json              # JSON Server database
+│   ├── db.json              # JSON Server database (also seeds localStorage)
+│   ├── server.js            # JSON Server API
 │   └── App.tsx              # Main application component
+├── .github/workflows/
+│   └── deploy.yml           # GitHub Pages deployment
+├── .env                     # Development config (JSON Server URL)
+├── .env.production          # Production config (empty API URL = localStorage)
 ├── package.json
 └── README.md
 ```
@@ -135,7 +144,7 @@ football-app/
 -   `yarn build` - build production application
 -   `yarn preview` - preview built application
 -   `yarn lint` - run code linter
--   `yarn serve:api` - start JSON Server API
+-   `yarn node ./src/server.js` - start JSON Server API
 
 ## 🔄 API Endpoints
 
@@ -143,18 +152,30 @@ JSON Server provides the following endpoints:
 
 -   `GET /players` - list players
 -   `POST /players` - add player
--   `PUT /players/:id` - edit player
+-   `PATCH /players/:id` - edit player
 -   `DELETE /players/:id` - delete player
 
 -   `GET /teams` - list teams
 -   `POST /teams` - add team
--   `PUT /teams/:id` - edit team
+-   `PATCH /teams/:id` - edit team
 -   `DELETE /teams/:id` - delete team
 
 -   `GET /games` - list games
 -   `POST /games` - add game
--   `PUT /games/:id` - edit game
+-   `PATCH /games/:id` - edit game
 -   `DELETE /games/:id` - delete game
+
+## 🌍 Deployment
+
+The app is deployed to GitHub Pages by a GitHub Actions workflow (`.github/workflows/deploy.yml`) on every push to `main`.
+
+GitHub Pages only serves static files, so JSON Server cannot run there. In production builds `VITE_API_URL` is empty (see `.env.production`), and the app uses `src/hooks/localApi.ts` instead, which stores data in the browser's `localStorage`:
+
+-   on the first visit the data is seeded from `src/db.json`
+-   changes are saved only in the visitor's browser
+-   to reset the data, remove the `football-app-db` key in DevTools → Application → Local Storage
+
+To build against a real API instead, set `VITE_API_URL` to its URL.
 
 ## 🎯 Optimizations
 
